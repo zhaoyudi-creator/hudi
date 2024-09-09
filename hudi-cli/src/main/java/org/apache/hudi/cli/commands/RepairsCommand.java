@@ -119,7 +119,7 @@ public class RepairsCommand {
     String latestCommit =
         client.getActiveTimeline().getCommitAndReplaceTimeline().lastInstant().get().getTimestamp();
     List<String> partitionPaths =
-        FSUtils.getAllPartitionFoldersThreeLevelsDown(HoodieCLI.storage, HoodieCLI.basePath);
+        FSUtils.getAllPartitionFoldersLevelsDown(HoodieCLI.storage, HoodieCLI.basePath, client.getTableConfig().getPartitionFields().get().length);
     StoragePath basePath = client.getBasePath();
     String[][] rows = new String[partitionPaths.size()][];
 

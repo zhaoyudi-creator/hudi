@@ -19,6 +19,9 @@
 
 package org.apache.hudi.common.fs;
 
+import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.PathFilter;
 import org.apache.hudi.common.config.HoodieMetadataConfig;
 import org.apache.hudi.common.engine.HoodieEngineContext;
 import org.apache.hudi.common.model.HoodieFileFormat;
@@ -166,6 +169,22 @@ public class FSUtils {
       datePartitions.add(
           String.format("%s/%s/%s", path.getParent().getParent().getName(), path.getParent().getName(),
               path.getName()));
+    }
+    return datePartitions;
+  }
+
+  public static List<String> getAllPartitionFoldersLevelsDown(HoodieStorage storage, String basePath, int levelNum) throws IOException {
+    List<String> datePartitions = new ArrayList<>();
+    String pattern = "";
+    for (int i=0; i< levelNum; i++) {
+      pattern += "/*";
+    }
+    StoragePathFilter filter = getExcludeMetaPathFilter();
+    List<StoragePathInfo> folders = storage.globEntries(new StoragePath(basePath + pattern), filter);
+    for (StoragePathInfo pathInfo : folders) {
+      StoragePath path = pathInfo.getPath();
+      datePartitions.add(
+          String.format("%s", getRelativePartitionPath(new StoragePath(basePath), path)));
     }
     return datePartitions;
   }
